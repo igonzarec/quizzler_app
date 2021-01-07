@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler_flutter_app/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
 void main() => runApp(Quizzler());
 
 class Quizzler extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,22 +24,69 @@ class Quizzler extends StatelessWidget {
 }
 
 class QuizPage extends StatefulWidget {
-
   @override
   _QuizPageState createState() => _QuizPageState();
 }
 
 class _QuizPageState extends State<QuizPage> {
-  List<Icon> scoreKeeper = [
-    // Icon(
-    //   Icons.check,
-    //   color: Colors.green,
-    // ),
-    // Icon(
-    //   Icons.close,
-    //   color: Colors.red,
-    // ),
-  ];
+  List<Icon> scoreKeeper = [];
+
+  void checkAnswer(bool userPickedAnswer, BuildContext context) {
+    bool correctAnswer = quizBrain.getQuestionAnswer();
+    setState(() {
+      if (quizBrain.getQuestionNumber() < quizBrain.getQuestionBankLength()-1){
+        if (userPickedAnswer == correctAnswer) {
+          scoreKeeper.add(
+            Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+          );
+        } else {
+          scoreKeeper.add(
+            Icon(
+              Icons.close,
+              color: Colors.red,
+            ),
+          );
+        }
+        quizBrain.nextQuestion();
+      } else {
+
+        Alert(
+
+          context: context,
+          type: AlertType.success,
+          title: "FINISHED!",
+          desc: "You answered all the questions. Press cool to restart the quiz",
+          buttons: [
+            DialogButton(
+              color: Colors.deepPurple,
+              child: Text(
+                "COOL",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              width: 120,
+            )
+          ],
+        ).show().then((value) {
+
+          setState(() {
+            quizBrain.restoreValues();
+            scoreKeeper = [];
+          });
+
+
+          return null;
+        });
+
+      }
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,18 +124,8 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-
                 //The user picked true.
-                bool correctAnswer =
-                quizBrain.getQuestionAnswer();
-                if (correctAnswer == true) {
-                  print("User got it right");
-                } else {
-                  print("User got it wrong");
-                }
-                  setState(() {
-                    quizBrain.nextQuestion();
-                  });
+                checkAnswer(true, context);
               },
             ),
           ),
@@ -107,16 +144,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked false.
-                bool correctAnswer =
-                quizBrain.getQuestionAnswer();
-                if (correctAnswer == false) {
-                  print("User got it right");
-                } else {
-                  print("User got it wrong");
-                }
-                setState(() {
-                  quizBrain.nextQuestion();
-                });
+                checkAnswer(false, context);
               },
             ),
           ),

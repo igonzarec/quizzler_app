@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:quizzler_flutter_app/questions.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class QuizBrain {
   int _questionNumber = 0;
@@ -46,5 +48,17 @@ class QuizBrain {
 
   bool getQuestionAnswer() {
     return _questionBank[_questionNumber].questionAnswer;
+  }
+
+  int getQuestionNumber() {
+    return _questionNumber;
+  }
+
+  int getQuestionBankLength(){
+    return _questionBank.length;
+  }
+
+  void restoreValues(){
+    _questionNumber = 0;
   }
 }
